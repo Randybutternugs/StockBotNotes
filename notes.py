@@ -65,3 +65,69 @@ ASR
 #Annualized sharp ratio value of 1 or greater is considered acceptable to good
 # 2 or greater is very good
 # 3 or higher is excellent
+
+# -=-=-=-=- PORTFOLIO OPTIMIZATION -=-=-=-=-=-=
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+aapl = pd.read_csv('AAPL_CLOSE', index_col = 'Date', parse_dates = True)
+cisco = pd.read_csv('CISCO_CLOSE', index_col = 'Date', parse_dates = True)
+ibm = pd.read_csv('IBM_CLOSE', index_col = 'Date', parse_dates = True)
+amzn = pd.read_csv('AMZN_CLOSE', index_col = 'Date', parse_dates = True)
+
+stocks = pd.concat([aapl, cisco, ibm, amzn], axis = 1)
+stocks.columns = ['aapl', 'cisco', 'ibm', 'amzn']
+stocks.head()
+
+#calculate mean daily return
+stocks.pct_change(1).mean()
+#find correlation between stocks using pearson correlation coefficent
+stocks.pct_change(1).corr()
+#This calculates Pearson Correlation Coefficient
+#-----------------------------------------------------
+#logarithmic returns vs arithmetic returns
+#We will use Log returns more because it allows us to normalize but heres a comparison
+#Arithmetically
+stocks.pct_change(1).head()
+#logarithmically
+log_ret = np.log(stocks / stocks.shift(1))
+log_ret.head()
+# youll see the numbers themselves are really similar but for more complex operations log is preferred
+# moving on
+log_ret.hist(bins =  100, figsize = (12, 8))
+plt.tight_layout()
+
+#this give us average or mean return of stock
+log_ret.mean()
+#find covariance
+#252 business days
+ log_ret.cov() * 252
+
+ print(stocks.columns)
+
+ weights = np.array(np.random.random(4))
+
+ print("Random Weights: ")
+ print(weights)
+#gotta make sure the weights add up to 100 so:
+print('Rebalance')
+weights = weights / np.sum(weights)
+print(weights)
+#so we get the same random numbers every time
+np.random.seed(101)
+
+# Expected Return
+print('Expected Portfolio Return')
+exp_ret = np.sum( (log_ret.mean() * weights) * 252)
+
+np.sum(log_ret.mean() * weights * 252)
+
+#Expected Variance / Volatility
+print('Expected Volatility')
+exp_vol = np.sqrt(np.dot(weights.T, np.dot(log_ret.cov() * 252, weights)))
+
+#Sharpe ratio
+print('Sharpe Ratio')
+SR = exp_ret / exp_vol
+print(SR)
