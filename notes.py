@@ -45,3 +45,23 @@ import matplotlib.pyplot as plt
 portfolio_val['Total Pos'].plot(figsize = (10, 8))
 
 portfolio_val.drop('Total Pos', axis = 1).plot(figsize = (10, 8))
+
+portfolio_val.head()
+
+portfolio_val['Daily Return'] = portfolio_val['Total Pos'].pct_change(1)
+portfolio_val.head()
+portfolio_val['Daily Return'].mean()
+portfolio_val['Daily Return'].std()
+portfolio_val['Daily Return'].plot(kind = 'hist', bins = 100, figsize = (4, 5))
+portfolio_val['Daily Return'].plot(kind = 'kde',figsize = (4, 5))
+cumulative_return = 100 * (portfolio_val['Total Pos'][-1] / portfolio_val['Total Pos'][0] - 1)
+cumulative_return
+portfolio_val['Total Pos'][-1]
+SR = portfolio_val['Daily Return'].mean() / portfolio_val['Daily Return'].std()
+SR
+
+ASR = (252**0.5) * SR
+ASR
+#Annualized sharp ratio value of 1 or greater is considered acceptable to good
+# 2 or greater is very good
+# 3 or higher is excellent
