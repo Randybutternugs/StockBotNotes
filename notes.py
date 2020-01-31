@@ -108,8 +108,8 @@ log_ret.mean()
 
  weights = np.array(np.random.random(4))
 
- print("Random Weights: ")
- print(weights)
+print("Random Weights: ")
+print(weights)
 #gotta make sure the weights add up to 100 so:
 print('Rebalance')
 weights = weights / np.sum(weights)
@@ -120,14 +120,72 @@ np.random.seed(101)
 # Expected Return
 print('Expected Portfolio Return')
 exp_ret = np.sum( (log_ret.mean() * weights) * 252)
-
+print(exp_ret)
 np.sum(log_ret.mean() * weights * 252)
 
 #Expected Variance / Volatility
 print('Expected Volatility')
 exp_vol = np.sqrt(np.dot(weights.T, np.dot(log_ret.cov() * 252, weights)))
-
+print(exp_vol)
 #Sharpe ratio
 print('Sharpe Ratio')
 SR = exp_ret / exp_vol
 print(SR)
+
+
+#=-=-=-=-=-=-==-=-PORTFOLIO ALLOCATION PT 2 (same as pt 1 but with for loop for efficiency)==========----------===============-----------------
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+np.random.seed(101)
+
+num_ports = 5000
+all_weights = np.zeros((num_ports, len(stocks.columns)))
+ret_arr = np.zeros(num_ports)
+vol_arr = np.zeros(num_ports)
+sharpe_arr = np.zeros(num_ports)
+
+for ind in range(num_ports):
+    #Weights
+    weights = np.array(np.random.random(4))
+    weights = weights / np.sum(weights)
+
+    #Save weights
+    all_weights[ind,:] = weights
+
+    #Expected Return
+    ret_arr[ind] = np.sum( (log_ret.mean() * weights) * 252)
+
+    #Expected Volatility
+    vol_arr[ind] = np.sqrt(np.dot(weights.T, np.dot(log_ret.cov() * 252, weights)))
+
+    #Sharpe Ratio
+    sharpe_arr[ind] = ret_arr[ind] / vol_arr[ind]
+
+#check the maximum value the sharpe array can possibly have after testing with FOR loop
+sharpe_arr.max()
+
+#Check the index location of that max so we can see the best
+sharpe_arr.argmax()
+
+#Find out the best portfolio allocations by calling the index locations
+all_weights[1420,:]
+#Now we know the optimal allocation of our money in our listed securities
+
+#now lets visualize the data
+plt.figure(figsize = (12, 8))
+plt.scatter(vol_arr, ret_arr, c = sharpe_arr, cmap = 'plasma')
+plt.colorbar(label = 'Sharpe Ratio')
+plt.xlabel('Volatility')
+plt.ylabel('Return')
+
+#we plot the point of the best portfolio allocation so we can see it on the plot
+max_sr_ret = ret_arr[1420]
+max_sr_vol = vol_arr[1420]
+plt.scatter(max_sr_vol, max_sr_ret, c = 'red', s = 50, edgecolors = 'black')
+#now we can find and visualize the best portfolio allocations YAHASHUYIDIGAPIFHUA
+#this is based off of 5000 random portfolio allocations, next is optimization
+
+#******************************************************************************
+#-=-=-=-=-=-=-=-=-PORTFOLIO ALLOCATION PART 3 (OPTIMIZATION WITH MATH BABAY)
+#******************************************************************************
