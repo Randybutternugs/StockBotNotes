@@ -102,11 +102,11 @@ plt.tight_layout()
 log_ret.mean()
 #find covariance
 #252 business days
- log_ret.cov() * 252
+log_ret.cov() * 252
 
- print(stocks.columns)
+print(stocks.columns)
 
- weights = np.array(np.random.random(4))
+weights = np.array(np.random.random(4))
 
 print("Random Weights: ")
 print(weights)
@@ -189,3 +189,58 @@ plt.scatter(max_sr_vol, max_sr_ret, c = 'red', s = 50, edgecolors = 'black')
 #******************************************************************************
 #-=-=-=-=-=-=-=-=-PORTFOLIO ALLOCATION PART 3 (OPTIMIZATION WITH MATH BABAY)
 #******************************************************************************
+def get_ret_vol_sr(weights):
+    weights = np.array(weights)
+    ret = np.sum(log_ret.mean() * weights) * 252
+    vol = np.sqrt(np.dot(weights.T, np.dot(log_ret.cov() * 252, weights)))
+    sr = ret/vol
+    return np.array([ret, vol, sr])
+
+from scipy.optimize import minimize
+#--=-=-=-=-=-==-gives us a guide on how to use scipy-==--=-=-=-=-=
+#help(minimize)
+
+#Takes in a weight allocation and then returns the negative sharpe ratio
+def neg_sharpe(weights):
+    return get_ret_vol_sr(weights)[2] * -1
+
+#help optimization and minimization using constraints because they will allow there to be less stuff to Check
+def check_sum(weights):
+    #this is going to return 0 if the sum of the weights is 1
+    return np.sum(weights) - 1
+    # if not it will return how off you are by 1 itself
+
+cons = ({'type' : 'eq', 'fun' : check_sum})
+bounds = ((0,1), (0,1), (0,1), (0,1))
+
+init_guess = [0.25, 0.25, 0.25, 0.25]
+
+opt_results = minimize(neg_sharpe, init_guess, method = 'SLSQP', bounds = bounds, constraints = cons)
+opt_results.x
+get_ret_vol_sr(opt_results.x)
+
+#finding the lowest risk possible for given level of return (efficiency frontier)
+
+frontier_y = np.linspace(0, 0.3, 100)
+def minimize_volatility(weights):
+    return get_ret_vol_sr(weights)[1]
+
+frontier_volatility = []
+
+for possible_return in frontier_y:
+    cons = ({'type' : 'eq', 'fun' : check_sum},
+            {'type' : 'eq', 'fun' : lambda w: get_ret_vol_sr(w)[0] - possible_return})
+
+    result = minimize(minimize_volatility, init_guess, method = 'SLSQP', bounds = bounds, constraints = cons)
+
+    frontier_volatility.append(result['fun'])
+
+plt.figure(figsize = (12, 8))
+plt.scatter(vol_arr, ret_arr, c = sharpe_arr, cmap = 'plasma')
+plt.colorbar(label = 'Sharpe Ratio')
+plt.xlabel('Volatility')
+plt.ylabel('Return')
+
+plt.plot(frontier_volatility, frontier_y, 'g--', linewidth = 3)
+# Now we have a line that tells us the best values for return given volatility and vice versa
+#This process is known as marcowitz portfolio optimization.
