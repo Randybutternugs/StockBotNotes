@@ -244,3 +244,12 @@ plt.ylabel('Return')
 plt.plot(frontier_volatility, frontier_y, 'g--', linewidth = 3)
 # Now we have a line that tells us the best values for return given volatility and vice versa
 #This process is known as marcowitz portfolio optimization.
+#
+#
+#
+#
+#==============================FINANCIAL MARKET CONCEPTS=============================
+#
+#
+#
+#
