@@ -300,3 +300,31 @@ beta
 alpha
 
 r_value
+
+#if our stock is in line with the market you will expect a high Beta value
+spy_etf['Daily Return'].head()
+
+import numpy as np
+#Now we create some noise
+#use random.normal so we can set paramaters like mean
+noise = np.random.normal(0, 0.001, len(spy_etf['Daily Return'].iloc[1:]))
+
+noise
+
+#we make a fake stock as a way to demonstrate high Beta. This stock will follow SPY trends
+fake_stock = spy_etf['Daily Return'].iloc[1:] + noise
+plt.scatter(fake_stock, spy_etf['Daily Return'].iloc[1:], alpha = 0.25)
+#Now we see obvious linear behavior and clear relationship
+#Now we use CAPM to prove it and to prove CAPM works
+beta,alpha,r_value,p_value,std_err = stats.linregress(fake_stock,
+                                                      spy_etf['Daily Return'].iloc[1:])
+#now we check beta value
+beta
+#very close to 1 making it very correlated, CAPM works
+
+#also means alpha should be very small
+alpha
+#note the euler number showing its tiny
+
+#NOTE ALWAYS USE ADJ CLOSE AND OPEN NEVER THE PURE ONES
+#you want a survivor bias free data set (quandl premium has this)
