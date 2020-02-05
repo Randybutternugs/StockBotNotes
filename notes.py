@@ -253,3 +253,50 @@ plt.plot(frontier_volatility, frontier_y, 'g--', linewidth = 3)
 #
 #
 #
+
+#^^^^^^^^^^^^^^^^^^^^^^^^^^CAPM CODE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+from scipy import stats
+# help(stats.linregress)
+import pandas as pd
+import pandas_datareader as web
+
+start = pd.to_datetime('2010-01-04')
+end = pd.to_datetime('2017-07-25')
+
+spy_etf = web.DataReader('SPY','yahoo', start, end)
+spy_etf.info()
+spy_etf.head()
+
+aapl = web.DataReader('AAPL', 'yahoo', start, end)
+aapl.head()
+
+import matplotlib.pyplot as plt
+
+aapl['Close'].plot(label = 'AAPL', figsize = (10,8))
+spy_etf['Close'].plot(label = 'SPY Index')
+plt.legend()
+
+aapl['Cumulative'] = aapl['Close'] / aapl['Close'].iloc[0]
+spy_etf['Cumulative'] = spy_etf['Close'] / spy_etf['Close'].iloc[0]
+
+#This graph shows how much I would have made in 2017 had I invested a dollar into
+#Each security before 2011.
+aapl['Cumulative'].plot(label = 'AAPL', figsize = (10, 8))
+spy_etf['Cumulative'].plot(label = 'SPY')
+plt.legend()
+
+
+aapl['Daily Return'] = aapl['Close'].pct_change(1)
+spy_etf['Daily Return'] = spy_etf['Close'].pct_change(1)
+plt.scatter(aapl["Daily Return"], spy_etf['Daily Return'], alpha = 0.25)
+
+#using tuple unpacking to get some values
+beta,alpha,r_value,p_value,std_err = stats.linregress(aapl['Daily Return'].iloc[1:],
+                                                      spy_etf['Daily Return'].iloc[1:])
+#Now we can call Beta and Alpha by itself
+
+beta
+
+alpha
+
+r_value
